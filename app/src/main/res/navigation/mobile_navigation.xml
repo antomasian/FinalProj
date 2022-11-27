@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_home">
+
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.tango.ui.home.HomeFragment"
+        android:label="@string/title_home"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_chats"
+        android:name="com.example.tango.ui.chats.ChatsListFragment"
+        android:label="Chats">
+        <action
+            android:id="@+id/action_ChatsListFrag_to_ChatFrag"
+            app:destination="@id/ChatFragment">
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/ChatFragment"
+        android:name="com.example.tango.ui.chats.ChatFragment"
+        android:label="Chat Fragment"
+        tools:layout="@layout/fragment_chat">
+        <argument
+            android:name="index"
+            app:argType="integer"
+            />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_profile"
+        android:name="com.example.tango.ui.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
+</navigation>
