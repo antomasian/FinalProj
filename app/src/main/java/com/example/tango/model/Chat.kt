@@ -9,12 +9,15 @@ class Chat {
     var chattingUserIDs: List<String> = emptyList()
 }
 
-class Message {
+class Message(senderID: String = "",
+              senderName: String = "",
+              recipientID: String = "",
+              text: String = "") {
     @DocumentId var id: String? = null
     @ServerTimestamp var createdTime: Date? = null
-    var senderID: String = ""
-    var senderName: String = ""
-    var recipientID: String = ""
-    var text: String = ""
+    var senderID: String = senderID
+    var senderName: String = senderName
+    var recipientID: String = recipientID
+    var text: String = text
     var isRead: Boolean = false
 }

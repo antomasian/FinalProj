@@ -2,8 +2,8 @@ package com.example.tango
 
 import android.app.Activity
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
-import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -14,10 +14,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import androidx.recyclerview.widget.RecyclerView
 import com.example.tango.databinding.ActivityMainBinding
 import com.example.tango.ui.AuthViewModel
-import com.google.firebase.FirebaseApp
+import com.example.tango.ui.chats.ChatsListViewModel
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -25,20 +25,35 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavView: BottomNavigationView
     private lateinit var binding: ActivityMainBinding
     private val authVM: AuthViewModel by viewModels()
+    private val chatsListViewModel: ChatsListViewModel by viewModels()
 
-        private val signInLauncher = registerForActivityResult(
+    private val signInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            // update user
-            // load chats
+            authVM.getUserInfo { isNewUser ->
+                if (isNewUser) {
+                    Log.i(javaClass.simpleName, "new user")
+                } else {
+                    Log.i(javaClass.simpleName, "existing user")
+                    chatsListViewModel.loadChats()
+                }
+            }
         } else {
             // sign in failed
         }
     }
 
     fun setBottomNavigationVisibility(visibility: Int) {
-        // get the reference of the bottomNavigationView and set the visibility.
         binding.navView.visibility = visibility
+    }
+
+    fun getPhotoFile(filename: String): File {
+        val directoryStorage = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(filename, ".jpg", directoryStorage)
+    }
+
+    fun reloadActivity() {
+        recreate()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +73,18 @@ class MainActivity : AppCompatActivity() {
         bottomNavView.setupWithNavController(navController)
 
         authVM.signUserIn(signInLauncher)
+
+        authVM.observeCurrentUser().observe(this) {
+            if (it != null) {
+                authVM.getUserInfo { isNewUser ->
+                    if (!isNewUser) {
+                        chatsListViewModel.loadChats()
+                    }
+                }
+            } else {
+
+            }
+        }
 
     }
 

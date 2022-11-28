@@ -3,6 +3,7 @@ package com.example.tango.services
 import android.util.Log
 import com.example.tango.model.Chat
 import com.example.tango.model.Message
+import com.example.tango.model.User
 import com.google.firebase.firestore.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
@@ -12,25 +13,25 @@ class ChatService {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
 
     @ExperimentalCoroutinesApi
-    fun CollectionReference.getQuerySnapshotFlow(): Flow<QuerySnapshot?> {
+    fun Query.getQuerySnapshotFlow(): Flow<QuerySnapshot?> {
         return callbackFlow {
             val listenerRegistration =
                 addSnapshotListener { querySnapshot, error ->
                     if (error != null) {
-                        Log.e(javaClass.simpleName, "Error fetching collection data at path - $path", error)
+//                        Log.e(javaClass.simpleName, "Error fetching collection data at path - $path", error)
                         return@addSnapshotListener
                     }
                     trySend(querySnapshot)
                 }
             awaitClose {
-                Log.d(javaClass.simpleName, "Cancelling the listener at collection path - $path")
+//                Log.d(javaClass.simpleName, "Cancelling the listener at collection path - $path")
                 listenerRegistration.remove()
             }
         }
     }
 
     @ExperimentalCoroutinesApi
-    fun <T> CollectionReference.getDataFlow(mapper: (QuerySnapshot?) -> T): Flow<T> {
+    fun <T> Query.getDataFlow(mapper: (QuerySnapshot?) -> T): Flow<T> {
         return getQuerySnapshotFlow()
             .map {
                 return@map mapper(it)
@@ -54,7 +55,8 @@ class ChatService {
     @ExperimentalCoroutinesApi
     fun getMessagesFlow(chatID: String): Flow<List<Message>> {
         Log.i(javaClass.simpleName, "Call to get messages for chat $chatID")
-        return db.collection("chats/$chatID/messages")
+        return db.collection("chats/$chatID/messages") // collection ref
+            .orderBy("createdTime")
             .getDataFlow { querySnapshot ->
                 querySnapshot?.documents?.map {
                     it.toObject(Message::class.java)!!
@@ -62,8 +64,30 @@ class ChatService {
             }
     }
 
-    fun fetchChattingUser() {
-
+    fun fetchChattingUser(uid: String, callback: (User?)->Unit) {
+        Log.i(javaClass.simpleName, "Call to fetch user doc $uid")
+        db.collection("users").document(uid)
+            .get()
+            .addOnSuccessListener { documentSnapshot ->
+                val user = documentSnapshot.toObject(User::class.java)
+                Log.i(javaClass.simpleName, "fetched user $user")
+                callback(user)
+            }
+            .addOnFailureListener {
+                Log.i(javaClass.simpleName, "chatting user $uid not found")
+                callback(null)
+            }
     }
 
+    fun createMessageDoc(chatID: String?, message: Message) {
+        if (chatID != null) {
+            db.collection("chats/$chatID/messages")
+                .add(message)
+                .addOnSuccessListener { docRef ->
+                    Log.i(javaClass.simpleName, "Added message doc")
+                }
+        } else {
+            Log.i(javaClass.simpleName, "chatID null")
+        }
+    }
 }

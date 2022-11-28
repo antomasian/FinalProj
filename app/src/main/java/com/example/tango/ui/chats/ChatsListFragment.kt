@@ -12,11 +12,14 @@ import com.example.finalproj.ui.chats.ChatRowAdapter
 import com.example.tango.MainActivity
 import com.example.tango.R
 import com.example.tango.databinding.FragmentChatsListBinding
+import com.example.tango.ui.AuthViewModel
 
 class ChatsListFragment : Fragment() {
     private var _binding: FragmentChatsListBinding? = null
     private val binding get() = _binding!!
     private val chatsListVM: ChatsListViewModel by activityViewModels()
+//    private val authViewModel: AuthViewModel by activityViewModels()
+//    private val chatsListVM = authViewModel.chatsListViewModel
 
     companion object {
         fun newInstance() = ChatsListFragment()

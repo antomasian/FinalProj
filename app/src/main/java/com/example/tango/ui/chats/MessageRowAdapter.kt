@@ -39,10 +39,7 @@ class MessageRowAdapter(private val viewModel: ChatViewModel)
     override fun onBindViewHolder(holder: VH, position: Int) {
         val binding = holder.messageRowBinding
         val item = getItem(position)
-        println("Applying: ${item.text}")
 
-
-        println("${item.senderID}, ${viewModel.uid}")
         val isMyMessage = (item.senderID == viewModel.uid)
 
         binding.apply {

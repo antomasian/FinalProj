@@ -70,4 +70,8 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.13.2'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'
     annotationProcessor 'androidx.annotation:annotation:1.5.0'
+
+    // leanback
+    implementation("androidx.leanback:leanback:1.2.0-alpha02")
+
 }

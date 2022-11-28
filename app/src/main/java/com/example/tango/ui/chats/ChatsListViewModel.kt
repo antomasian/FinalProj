@@ -14,9 +14,29 @@ class ChatsListViewModel : ViewModel() {
     private val chatService = ChatService()
     var chatViewModels = MutableLiveData<List<ChatViewModel>>(emptyList())
 
-    init {
+//    init {
+//        val uid = FirebaseAuth.getInstance().currentUser!!.uid
+//        Log.i(javaClass.simpleName, "ChatsListVM initialized")
+//        viewModelScope.launch {
+//            chatService.getChatsFlow().collect { chats ->
+//                Log.d(javaClass.simpleName, "Received ${chats.count()} chats")
+//                for (chat in chats) {
+//                    val existingChatIDs = chatViewModels.value!!.map { it.chat.id }
+//                    if (!existingChatIDs.contains(chat.id)) {
+//                        // new chat
+//                        var updatedChatsVMs = chatViewModels.value!!.toMutableList()
+//                        val newChatVM = ChatViewModel(chat, uid, chatService)
+//                        updatedChatsVMs.add(newChatVM)
+//                        chatViewModels.value = updatedChatsVMs
+//                    }
+//                }
+//            }
+//        }
+//    }
+
+
+    fun loadChats() {
         val uid = FirebaseAuth.getInstance().currentUser!!.uid
-        Log.i(javaClass.simpleName, "ChatsListVM initialized")
         viewModelScope.launch {
             chatService.getChatsFlow().collect { chats ->
                 Log.d(javaClass.simpleName, "Received ${chats.count()} chats")

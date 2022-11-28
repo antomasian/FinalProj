@@ -4,21 +4,50 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:id="@+id/profPicImgView"
-        android:src="@drawable/ic_baseline_account_circle_24"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        app:layout_constraintRight_toRightOf="parent"
+        app:cardCornerRadius="100dp"
+        android:layout_margin="20dp">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/profPicImgView"
+            android:src="@drawable/ic_baseline_account_circle_24" />
+    </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/addPicButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change Pic"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/centerButton"
+        app:layout_constraintTop_toBottomOf="@id/cardView"/>
+
+    <Button
+        android:id="@+id/centerButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/centerButton"
+        android:text="Sign Out"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/displayNameTV"
+        ></Button>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/displayNameTV"
         android:text="Display Name"
         android:textSize="24sp"
-        app:layout_constraintTop_toBottomOf="@id/profPicImgView"
+        app:layout_constraintTop_toBottomOf="@id/centerButton"
         android:gravity="center_horizontal"/>
     <TextView
         android:layout_width="match_parent"

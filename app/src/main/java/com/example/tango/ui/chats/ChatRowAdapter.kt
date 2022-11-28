@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.commitNow
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -41,7 +42,14 @@ class ChatRowAdapter(private val viewModel: ChatsListViewModel, private val main
         val binding = holder.chatRowBinding
         val item = getItem(position)
         binding.apply {
-            binding.displayName.text = item.chat.id
+
+            item.chattingUser?.observe(mainActivity) {
+                binding.displayName.text = it?.displayName
+            }
+            item.messages?.observe(mainActivity) {
+                binding.messageText.text = it?.lastOrNull()?.text
+            }
+            item.fetchProfilePic(imageView = binding.imageView)
         }
 
         binding.root.setOnClickListener {
