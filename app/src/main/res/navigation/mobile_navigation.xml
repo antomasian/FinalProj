@@ -10,8 +10,20 @@
         android:name="com.example.tango.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_HomeFrag_to_ProfileFrag"
+            app:destination="@+id/profileFragment"
+            ></action>
     </fragment>
-
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.tango.ui.profile.ProfileFragment"
+        android:label="Ext Profile">
+        <argument
+            android:name="isMyProfile"
+            app:argType="boolean"
+            android:defaultValue="false"/>
+        </fragment>
     <fragment
         android:id="@+id/navigation_chats"
         android:name="com.example.tango.ui.chats.ChatsListFragment"
@@ -28,12 +40,16 @@
         tools:layout="@layout/fragment_chat">
         <argument
             android:name="index"
-            app:argType="integer"
-            />
+            app:argType="integer" />
     </fragment>
     <fragment
         android:id="@+id/navigation_profile"
         android:name="com.example.tango.ui.profile.ProfileFragment"
-        android:label="Profile"
-        tools:layout="@layout/fragment_profile" />
+        android:label="My Profile"
+        tools:layout="@layout/fragment_profile" >
+        <argument
+            android:name="isMyProfile"
+            app:argType="boolean"
+            android:defaultValue="true"/>
+    </fragment>
 </navigation>

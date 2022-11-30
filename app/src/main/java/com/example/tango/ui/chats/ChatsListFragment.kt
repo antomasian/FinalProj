@@ -6,13 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.commitNow
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.finalproj.ui.chats.ChatRowAdapter
-import com.example.tango.MainActivity
-import com.example.tango.R
+import com.example.tango.ui.BottomNavActivity
 import com.example.tango.databinding.FragmentChatsListBinding
-import com.example.tango.ui.AuthViewModel
+import com.example.tango.viewModels.ChatsListViewModel
 
 class ChatsListFragment : Fragment() {
     private var _binding: FragmentChatsListBinding? = null
@@ -41,7 +39,7 @@ class ChatsListFragment : Fragment() {
         // init adapter
         val layoutManager = LinearLayoutManager(binding.root.context)
         binding.recyclerView.layoutManager = layoutManager
-        val mainActivity = requireActivity() as MainActivity
+        val mainActivity = requireActivity() as BottomNavActivity
         val adapter = ChatRowAdapter(chatsListVM, mainActivity)
         binding.recyclerView.adapter = adapter
 

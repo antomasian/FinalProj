@@ -9,9 +9,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.tango.MainActivity
+import com.example.tango.ui.BottomNavActivity
 import com.example.tango.databinding.FragmentChatBinding
-import com.example.tango.ui.AuthViewModel
+import com.example.tango.viewModels.ChatsListViewModel
 
 class ChatFragment : Fragment() {
     private var _binding: FragmentChatBinding? = null
@@ -20,17 +20,15 @@ class ChatFragment : Fragment() {
     private val binding get() = _binding!!
     private val chatsListVM: ChatsListViewModel by activityViewModels()
     private val args: ChatFragmentArgs by navArgs()
-//    private val authUserViewModel: AuthViewModel by activityViewModels()
-//    private val chatsListVM = authUserViewModel.chatsListViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val mainActivity = requireActivity() as MainActivity
+        val mainActivity = requireActivity() as BottomNavActivity
         mainActivity.setBottomNavigationVisibility(View.GONE)
         _binding = FragmentChatBinding.inflate(inflater, container, false)
-      return binding.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,17 +37,15 @@ class ChatFragment : Fragment() {
         val chatVM = chatsListVM.chatViewModels.value!![args.index]
 
         val layoutManager = LinearLayoutManager(binding.root.context)
-//        layoutManager.stackFromEnd = true
         binding.messagesRV.layoutManager = layoutManager
         val adapter = MessageRowAdapter(chatVM)
         binding.messagesRV.adapter = adapter
+
 
         chatVM.observeMessages().observe(viewLifecycleOwner) { messages ->
             Log.d(javaClass.simpleName, "Submitting ${messages.count()} messages")
             adapter.submitList(messages)
             val count = adapter.itemCount
-            println("count is $count")
-//            binding.messagesRV.scrollToPosition(adapter.itemCount-1)
         }
 
         binding.sendButton.setOnClickListener {
@@ -66,7 +62,7 @@ class ChatFragment : Fragment() {
 
 override fun onDestroyView() {
         super.onDestroyView()
-    val mainActivity = requireActivity() as MainActivity
+    val mainActivity = requireActivity() as BottomNavActivity
     mainActivity.setBottomNavigationVisibility(View.VISIBLE)
     _binding = null
     }

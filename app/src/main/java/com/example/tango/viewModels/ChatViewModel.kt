@@ -1,4 +1,4 @@
-package com.example.tango.ui.chats
+package com.example.tango.viewModels
 
 import android.util.Log
 import android.widget.ImageView
@@ -12,16 +12,16 @@ import com.example.tango.model.Message
 import com.example.tango.model.User
 import com.example.tango.services.ChatService
 import com.example.tango.services.Storage
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class ChatViewModel(val chat: Chat,
                     val uid: String,
-                    private val chatService: ChatService
+                    private val chatService: ChatService,
+                    private val profilesListVM: ProfilesListViewModel
 ) : ViewModel() {
-
     var messages = MutableLiveData<List<Message>>(emptyList())
-    var chattingUser = MutableLiveData<User?>(null)
+    var chattingProfileVM = MutableLiveData<ProfileViewModel?>(null)
+    private var chatUserID = MutableLiveData<String?>(null)
     private val storage = Storage() // TODO: Pass in
 
     init {
@@ -36,24 +36,25 @@ class ChatViewModel(val chat: Chat,
     }
 
     private fun fetchChattingUser() {
-        Log.d(javaClass.simpleName, "Call to fetchChattingUser")
-        // TODO: fix the actual chat docs to make sense w new uids
-        val chatUserID = chat.chattingUserIDs.filter { it != uid }[0]
-        chatService.fetchChattingUser(chatUserID) { user ->
-            Log.i(javaClass.simpleName, "chattingUser is ${user?.displayName}")
-            chattingUser.postValue(user)
-        }
-
+        chatUserID.postValue(chat.chattingUserIDs.filter { it != uid }[0])
+        val chatuserid = chat.chattingUserIDs.filter { it != uid }[0]
+//        if (chatUserID.value != null) {
+            profilesListVM.getUser(chatuserid, chattingProfileVM)
+//        }
     }
 
-    fun fetchProfilePic(uid: String = "iC60h19LByDlsY75g2Bl", imageView: ImageView) {
+    fun getProfilePic(imageView: ImageView) {
         Log.d(javaClass.simpleName, "Call to fetchProfPic")
-        val storagePath = "users/$uid/profilePic"
+        val storagePath = "users/${chatUserID.value}/profilePic"
         Glide.fetch(storage.uuid2StorageReference(storagePath), imageView)
     }
 
     fun observeMessages(): LiveData<List<Message>> {
         return messages
+    }
+
+    fun observeChattingProfileVM(): LiveData<ProfileViewModel?> {
+        return chattingProfileVM
     }
 
     fun sendMessage(text: String) {

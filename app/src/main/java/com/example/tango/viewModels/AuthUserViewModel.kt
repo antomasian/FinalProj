@@ -1,4 +1,4 @@
-package com.example.tango.ui
+package com.example.tango.viewModels
 
 import android.content.Context
 import android.content.Intent
@@ -10,21 +10,19 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.tango.model.User
 import com.example.tango.services.UserService
-import com.example.tango.ui.chats.ChatsListViewModel
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AuthViewModel(): ViewModel() {
+class AuthUserViewModel(): ViewModel() {
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val userService = UserService()
-    val usersList = MutableLiveData<List<User>>(emptyList())
     var currentUser = MutableLiveData<User?>(null)
     var currentFirebaseUser = MutableLiveData<FirebaseUser?>(null)
+    private val profileViewModel = ProfileViewModel()
 
     init {
-//        userService.fetchAvailableUsers(usersList)
         FirebaseAuth.getInstance().addAuthStateListener {
             currentFirebaseUser.postValue(FirebaseAuth.getInstance().currentUser)
         }
@@ -51,6 +49,12 @@ class AuthViewModel(): ViewModel() {
         }
     }
 
+    fun createNewUser(user: User, callback: (Boolean) -> Unit) {
+        userService.createUserDoc(user, currentFirebaseUser.value!!.uid) { success ->
+            callback(true)
+        }
+    }
+
     fun getUserInfo(callback: (Boolean) -> Unit) {
         val user = FirebaseAuth.getInstance().currentUser
         Log.d(javaClass.simpleName, "Logged in as ${user!!.displayName}, email ${user!!.email}")
@@ -66,18 +70,22 @@ class AuthViewModel(): ViewModel() {
         }
     }
 
+    fun getProfilePic(imageView: ImageView) {
+        // TODO: change
+        profileViewModel.currentUser.postValue(currentUser.value)
+        profileViewModel.getProfilePic(imageView)
+    }
+
     fun signUserOut(context: Context, callback: (Boolean)->Unit) {
-        FirebaseAuth.getInstance().signOut()
+        Log.i(javaClass.simpleName, "Call to sign user out")
         AuthUI.getInstance().signOut(context)
             .addOnSuccessListener {
+                Log.i(javaClass.simpleName, "SUCCESS SIGN OUT")
                 callback(true)
             }
             .addOnFailureListener {
-                Log.i(javaClass.simpleName, "FAILED TO LOG OUT")
+                Log.i(javaClass.simpleName, "FAILED SIGN OUT")
+                callback(false)
             }
-    }
-
-    fun getProfilePic(imageView: ImageView) {
-        userService.fetchProfilePic(imageView)
     }
 }

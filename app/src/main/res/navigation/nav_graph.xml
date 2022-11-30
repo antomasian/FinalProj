@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/LoadingFragment">
+
+    <fragment
+        android:id="@+id/LoadingFragment"
+        android:name="com.example.tango.ui.onboarding.LoadingFragment"
+        android:label="Loading Fragment"
+        tools:layout="@layout/fragment_loading">
+        <action
+            android:id="@+id/action_LoadingFragment_to_OnboardingFragment"
+            app:destination="@id/OnboardingFragment"
+            app:popUpTo="@id/LoadingFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/OnboardingFragment"
+        android:name="com.example.tango.ui.onboarding.OnboardingFragment"
+        android:label="Create Account"
+        tools:layout="@layout/fragment_onboarding">
+    </fragment>
+
+</navigation>

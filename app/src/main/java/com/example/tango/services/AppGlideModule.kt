@@ -41,7 +41,7 @@ object Glide {
             .asBitmap() // Try to display animated Gifs and video still
             .load(storageReference)
             .apply(glideOptions)
-            .error(android.R.color.holo_red_dark)
+            .error(android.R.color.darker_gray)
             .override(width, height)
             .into(imageView)
     }

@@ -1,6 +1,5 @@
-package com.example.tango.ui.chats
-import android.content.Context
-import android.content.Intent
+package com.example.tango.viewModels
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -14,26 +13,8 @@ class ChatsListViewModel : ViewModel() {
     private val chatService = ChatService()
     var chatViewModels = MutableLiveData<List<ChatViewModel>>(emptyList())
 
-//    init {
-//        val uid = FirebaseAuth.getInstance().currentUser!!.uid
-//        Log.i(javaClass.simpleName, "ChatsListVM initialized")
-//        viewModelScope.launch {
-//            chatService.getChatsFlow().collect { chats ->
-//                Log.d(javaClass.simpleName, "Received ${chats.count()} chats")
-//                for (chat in chats) {
-//                    val existingChatIDs = chatViewModels.value!!.map { it.chat.id }
-//                    if (!existingChatIDs.contains(chat.id)) {
-//                        // new chat
-//                        var updatedChatsVMs = chatViewModels.value!!.toMutableList()
-//                        val newChatVM = ChatViewModel(chat, uid, chatService)
-//                        updatedChatsVMs.add(newChatVM)
-//                        chatViewModels.value = updatedChatsVMs
-//                    }
-//                }
-//            }
-//        }
-//    }
-
+    //TODO: profilesListVM must be init
+    private val profilesListVM = ProfilesListViewModel()
 
     fun loadChats() {
         val uid = FirebaseAuth.getInstance().currentUser!!.uid
@@ -45,7 +26,7 @@ class ChatsListViewModel : ViewModel() {
                     if (!existingChatIDs.contains(chat.id)) {
                         // new chat
                         var updatedChatsVMs = chatViewModels.value!!.toMutableList()
-                        val newChatVM = ChatViewModel(chat, uid, chatService)
+                        val newChatVM = ChatViewModel(chat, uid, chatService, profilesListVM)
                         updatedChatsVMs.add(newChatVM)
                         chatViewModels.value = updatedChatsVMs
                     }
@@ -56,13 +37,6 @@ class ChatsListViewModel : ViewModel() {
 
     fun observeChatsListVMs(): LiveData<List<ChatViewModel>> {
         return chatViewModels
-    }
-
-    companion object {
-        fun doOneChat(context: Context) {
-//            val intent = Intent(context, ChatActivity::class.java)
-//            context.startActivity(intent)
-        }
     }
 
 }

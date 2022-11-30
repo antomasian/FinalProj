@@ -1,31 +1,27 @@
-package com.example.tango
+package com.example.tango.ui
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
+import com.example.tango.R
 import com.example.tango.databinding.ActivityMainBinding
-import com.example.tango.ui.AuthViewModel
-import com.example.tango.ui.chats.ChatsListViewModel
+import com.example.tango.viewModels.AuthUserViewModel
+import com.example.tango.ui.onboarding.LoadingFragmentDirections
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var navController: NavController
-    private lateinit var bottomNavView: BottomNavigationView
     private lateinit var binding: ActivityMainBinding
-    private val authVM: AuthViewModel by viewModels()
-    private val chatsListViewModel: ChatsListViewModel by viewModels()
+    private val authVM: AuthUserViewModel by viewModels()
 
     private val signInLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) { result ->
@@ -33,18 +29,14 @@ class MainActivity : AppCompatActivity() {
             authVM.getUserInfo { isNewUser ->
                 if (isNewUser) {
                     Log.i(javaClass.simpleName, "new user")
+                    onboardUser()
                 } else {
                     Log.i(javaClass.simpleName, "existing user")
-                    chatsListViewModel.loadChats()
                 }
             }
         } else {
-            // sign in failed
+            Log.e(javaClass.simpleName, "Error signing in")
         }
-    }
-
-    fun setBottomNavigationVisibility(visibility: Int) {
-        binding.navView.visibility = visibility
     }
 
     fun getPhotoFile(filename: String): File {
@@ -52,8 +44,27 @@ class MainActivity : AppCompatActivity() {
         return File.createTempFile(filename, ".jpg", directoryStorage)
     }
 
+    fun onboardUser() {
+        val action = LoadingFragmentDirections.actionLoadingFragmentToOnboardingFragment()
+        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        navController.navigate(action)
+    }
+
     fun reloadActivity() {
         recreate()
+    }
+
+    fun createNewUser(user: com.example.tango.model.User) {
+        authVM.createNewUser(user) { success ->
+            if (success) {
+                Log.i(javaClass.simpleName, "success creating user")
+                finish()
+                val intent = Intent(this, BottomNavActivity::class.java)
+                startActivity(intent)
+            } else {
+                // TODO: show alert
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,16 +72,11 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
-        bottomNavView = binding.navView
-        navController = findNavController(R.id.nav_host_fragment_activity_main)
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.navigation_home, R.id.navigation_chats, R.id.navigation_profile
-            )
-        )
+        val navController: NavController = findNavController(R.id.nav_host_fragment_content_main)
+        appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
-        bottomNavView.setupWithNavController(navController)
 
         authVM.signUserIn(signInLauncher)
 
@@ -78,7 +84,10 @@ class MainActivity : AppCompatActivity() {
             if (it != null) {
                 authVM.getUserInfo { isNewUser ->
                     if (!isNewUser) {
-                        chatsListViewModel.loadChats()
+                        val intent = Intent(this, BottomNavActivity::class.java)
+                        startActivity(intent)
+                    } else {
+                        onboardUser()
                     }
                 }
             } else {
@@ -86,10 +95,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
     }
 }

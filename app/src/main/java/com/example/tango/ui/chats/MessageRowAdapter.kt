@@ -2,19 +2,16 @@ package com.example.tango.ui.chats
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import androidx.core.view.GravityCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tango.R
 import com.example.tango.databinding.MessageRowBinding
 import com.example.tango.model.Message
+import com.example.tango.viewModels.ChatViewModel
 
 class MessageRowAdapter(private val viewModel: ChatViewModel)
     : ListAdapter<Message, MessageRowAdapter.VH>(MessageDiff()) {

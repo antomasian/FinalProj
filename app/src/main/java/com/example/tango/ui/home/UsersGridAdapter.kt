@@ -1,37 +1,49 @@
 package com.example.tango.ui.home
 
-import android.R
-import android.content.Context
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.ListAdapter
-import android.widget.TextView
-import androidx.annotation.NonNull
-import androidx.annotation.Nullable
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.example.tango.databinding.UserGridItemBinding
-import com.example.tango.ui.AuthViewModel
+import com.example.tango.databinding.ProfileGridItemBinding
+import com.example.tango.ui.BottomNavActivity
+import com.example.tango.viewModels.ProfileViewModel
+import com.example.tango.viewModels.ProfilesListViewModel
 
-class UsersGridAdapter(private val usersList: List<com.example.tango.model.User>)
-    : RecyclerView.Adapter<UsersGridAdapter.VH>() {
+class UsersGridAdapter(private val profilesListViewModel: ProfilesListViewModel, private val bottomNavActivity: BottomNavActivity)
+    : androidx.recyclerview.widget.ListAdapter<ProfileViewModel, UsersGridAdapter.VH>(ProfileDiff()) {
+    class ProfileDiff : DiffUtil.ItemCallback<ProfileViewModel>() {
+        override fun areItemsTheSame(oldItem: ProfileViewModel, newItem: ProfileViewModel): Boolean {
+            return oldItem.currentUser?.value?.id == newItem.currentUser?.value?.id
+        }
+        @SuppressLint("DiffUtilEquals")
+        override fun areContentsTheSame(oldItem: ProfileViewModel, newItem: ProfileViewModel): Boolean {
+            return oldItem == newItem
+        }
+    }
 
-    inner class VH(val userRowBinding: UserGridItemBinding)
-        : RecyclerView.ViewHolder(userRowBinding.root)
+    inner class VH(val userGridItemBinding: ProfileGridItemBinding)
+        : RecyclerView.ViewHolder(userGridItemBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        val binding = UserGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding = ProfileGridItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return VH(binding)
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        val binding = holder.userRowBinding
-        binding.displayNameTV.text = usersList.get(position).displayName
+        val binding = holder.userGridItemBinding
+        val item = getItem(position)
+        binding.apply {
+            profilesListViewModel.observeProfiles().observe(bottomNavActivity) {
+                binding.displayNameTV.text = item.currentUser?.value?.displayName
+            }
+            item.getProfilePic(binding.profPicImgView)
+        }
+
+        binding.root.setOnClickListener {
+            bottomNavActivity.launchProfileFragment()
+        }
+
     }
 
-    override fun getItemCount(): Int {
-        return usersList.count()
-    }
 }
